@@ -3,120 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة صحة | الإجازات المرضية</title>
+    <title>منصة صحة | طباعة تقرير إجازة مرضية</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; overflow-x: hidden; }
-        
-        /* الهيدر */
-        .header-custom { display: flex; justify-content: space-between; align-items: center; padding: 12px 5%; background: #fff; border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; z-index: 1000; }
-        .burger-icon { color: #cbd5e0; font-size: 26px; cursor: pointer; border: none; background: none; }
-        .seha-logo-top { height: 35px; }
+        /* تنسيق الموقع العام - لا يظهر في الطباعة */
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .no-print { display: block; }
+        .header-web { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2c5ba3; }
+        .hero-web { text-align: center; padding: 50px 20px; }
+        .search-card { background: white; max-width: 450px; margin: 0 auto; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 
-        /* القائمة الجانبية (Overlay Menu) */
-        #sideNav { height: 100%; width: 0; position: fixed; z-index: 2000; top: 0; right: 0; background-color: #fff; overflow-x: hidden; transition: 0.4s; padding-top: 60px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
-        #sideNav a { padding: 15px 32px; text-decoration: none; font-size: 1rem; color: #2c5ba3; display: block; transition: 0.3s; border-bottom: 1px solid #f9f9f9; text-align: center; font-weight: 500; }
-        #sideNav .closebtn { position: absolute; top: 10px; left: 25px; font-size: 36px; color: #cbd5e0; cursor: pointer; }
-        .login-btn-menu { background: #2c5ba3; color: white !important; margin: 20px 30px; border-radius: 5px; }
+        /* --- تصميم التقرير الرسمي (مطابق للـ PDF) --- */
+        #official-report { 
+            display: none; /* مخفي في الموقع ويظهر في الطباعة */
+            width: 210mm; min-height: 297mm; padding: 15mm; margin: auto; background: white; color: #000;
+        }
+        .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #000; padding-bottom: 10px; }
+        .header-titles { text-align: center; flex-grow: 1; }
+        .header-titles h2 { margin: 0; font-size: 1.4rem; font-weight: bold; }
+        .header-titles p { margin: 0; font-size: 1rem; color: #333; }
 
-        /* المحتوى */
-        .hero-section { padding: 60px 20px; text-align: center; }
-        .hero-section h1 { color: #2c5ba3; font-weight: 700; font-size: 1.8rem; margin-bottom: 15px; }
-        .hero-section p { color: #a0aec0; font-size: 0.85rem; max-width: 650px; margin: 0 auto 40px; }
-        .search-container { max-width: 400px; margin: 0 auto; }
-        .form-input { border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px; width: 100%; margin-bottom: 15px; text-align: center; }
-        .btn-blue { background: #3182ce; color: white; border: none; padding: 10px 40px; border-radius: 5px; width: 120px; margin-bottom: 10px; }
-        .btn-dark { background: #2c5ba3; color: white; border: none; padding: 10px 40px; border-radius: 5px; width: 220px; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .data-table td { border: 1px solid #000; padding: 8px 12px; font-size: 0.9rem; vertical-align: middle; }
+        .label-en { text-align: left; width: 20%; font-weight: 500; }
+        .label-ar { text-align: right; width: 20%; font-weight: 500; }
+        .value-cell { text-align: center; width: 60%; font-weight: bold; background: #fafafa; }
 
-        /* الفوتر الأزرق */
-        .footer-blue { background: #2c5ba3; color: white; padding: 70px 8% 40px; text-align: center; margin-top: 100px; }
-        .f-logo-white { height: 50px; margin-bottom: 30px; filter: brightness(0) invert(1); }
-        .f-desc { font-size: 0.85rem; line-height: 1.9; opacity: 0.9; max-width: 850px; margin: 0 auto 50px; }
-        .f-title { border-bottom: 1px solid rgba(255,255,255,0.2); display: inline-block; padding-bottom: 8px; margin-bottom: 25px; width: 180px; }
-        .f-links { list-style: none; padding: 0; margin-bottom: 50px; font-size: 0.9rem; opacity: 0.8; }
-        .f-links li { margin-bottom: 12px; }
+        .footer-logos { margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #000; padding-top: 15px; }
+        .verification-info { font-size: 0.75rem; line-height: 1.5; }
 
-        /* شعارات الفوتر السفلية */
-        .bottom-row { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px; display: flex; justify-content: space-between; align-items: center; }
-        .brand-imgs img { height: 35px; filter: brightness(0) invert(1); margin-left: 20px; }
-        .copy-info { font-size: 0.75rem; opacity: 0.6; text-align: left; }
-
-        /* النتيجة */
-        #resultBox { display: none; margin-top: 30px; text-align: right; background: #fafafa; padding: 20px; border-radius: 8px; border-right: 5px solid #2c5ba3; }
+        /* إعدادات الطباعة */
+        @media print {
+            @page { size: A4; margin: 0; }
+            .no-print { display: none !important; }
+            #official-report { display: block !important; margin: 0; width: 100%; padding: 20mm; }
+            body { background: white; }
+        }
     </style>
 </head>
 <body>
 
-<div id="sideNav">
-    <span class="closebtn" onclick="closeNav()">&times;</span>
-    <a href="#">الرئيسية</a>
-    <a href="#">الخدمات</a>
-    <a href="#">الاستعلامات</a>
-    <a href="#">الأسئلة الشائعة</a>
-    <a href="#">تواصل معنا</a>
-    <a href="#" class="login-btn-menu">تسجيل الدخول</a>
-</div>
+<div class="no-print">
+    <div class="header-web">
+        <div style="font-size: 24px; color: #ccc;">☰</div>
+        <img src="https://www.seha.sa/assets/images/logo.png" height="40">
+    </div>
 
-<div class="header-custom">
-    <button class="burger-icon" onclick="openNav()">☰</button>
-    <img src="https://www.seha.sa/assets/images/logo.png" class="seha-logo-top" alt="Seha">
-</div>
-
-<div class="hero-section">
-    <h1>الإجازات المرضية</h1>
-    <p>خدمة الاستعلام عن الإجازات المرضية تتيح لك الاستعلام عن حالة طلبك للإجازة ويمكنك طباعتها عن طريق تطبيق صحتي</p>
-    
-    <div class="search-container">
-        <input type="text" id="sCode" class="form-input" placeholder="رمز الخدمة">
-        <input type="text" id="nId" class="form-input" placeholder="رقم الهوية / الإقامة">
+    <div class="hero-web">
+        <h2 style="color: #2c5ba3; font-weight: 700;">الإجازات المرضية</h2>
+        <p class="text-muted">أدخل البيانات للتحقق وطباعة التقرير الرسمي</p>
         
-        <button class="btn-blue" onclick="search()">استعلام</button><br>
-        <button class="btn-dark">رجوع للاستعلامات</button>
-
-        <div id="resultBox">
-            <p><strong>الاسم:</strong> <span id="out-n"></span></p>
-            <p><strong>التاريخ:</strong> <span id="out-d"></span></p>
-            <p><strong>الطبيب:</strong> <span id="out-dr"></span></p>
-            <button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="window.print()">طباعة التقرير</button>
+        <div class="search-card">
+            <input type="text" id="codeIn" class="form-control mb-3" placeholder="رمز الخدمة (GSL...)">
+            <input type="text" id="idIn" class="form-control mb-3" placeholder="رقم الهوية / الإقامة">
+            <button class="btn btn-primary w-100 py-2" onclick="generateReport()">استعلام وعرض التقرير</button>
+            
+            <div id="print-btn-container" style="display:none;" class="mt-3">
+                <button class="btn btn-success w-100" onclick="window.print()">اضغط هنا للطباعة (نسخة الـ PDF)</button>
+            </div>
         </div>
     </div>
 </div>
 
-<footer class="footer-blue">
-    <img src="https://www.seha.sa/assets/images/logo.png" class="f-logo-white" alt="Seha White">
-    <p class="f-desc">منصة صحة تخدم جميع المنشآت الطبية من خلال تقديم الخدمات الصحية إلكترونياً لجميع المنشآت الطبية وتسعى إلى توحيد وأتمتة الإجراءات والخدمات بما في ذلك رفع جودة الأداء وخفض التكاليف.</p>
-    
-    <div class="f-title">القائمة الرئيسية</div>
-    <ul class="f-links">
-        <li>الخدمات</li><li>الاستعلامات</li><li>الأسئلة الشائعة</li><li>تواصل معنا</li>
-    </ul>
-
-    <div class="f-title">تواصل معنا</div>
-    <div class="bottom-row">
-        <div class="brand-imgs">
-            <img src="https://upload.wikimedia.org/wikipedia/ar/thumb/8/82/Ministry_of_Health_Logo.svg/1200px-Ministry_of_Health_Logo.svg.png" alt="MOH">
-            <img src="https://lean.sa/assets/img/lean-logo-white.png" alt="Lean">
+<div id="official-report">
+    <div class="report-header">
+        <div style="text-align: right;">
+            <p><strong>صحة</strong></p>
+            <p>Seha</p>
         </div>
-        <div class="copy-info">منصة صحة معتمدة من قبل وزارة الصحة © 2025<br>سياسة الخصوصية وشروط الاستخدام</div>
+        <div class="header-titles">
+            <h2>تقرير إجازة مرضية</h2>
+            <p>Sick Leave Report</p>
+        </div>
+        <div style="text-align: left;">
+            <p>المملكة العربية السعودية</p>
+            <p>Kingdom of Saudi Arabia</p>
+        </div>
     </div>
-</footer>
+
+    <table class="data-table">
+        <tr>
+            <td class="label-en">Leave ID</td>
+            <td class="value-cell" id="v-id"></td>
+            <td class="label-ar">رمز الإجازة</td>
+        </tr>
+        <tr>
+            <td class="label-en">Leave Duration</td>
+            <td class="value-cell" id="v-dur"></td>
+            <td class="label-ar">مدة الإجازة</td>
+        </tr>
+        <tr>
+            <td class="label-en">Admission Date</td>
+            <td class="value-cell" id="v-adm"></td>
+            <td class="label-ar">تاريخ الدخول</td>
+        </tr>
+        <tr>
+            <td class="label-en">Discharge Date</td>
+            <td class="value-cell" id="v-dis"></td>
+            <td class="label-ar">تاريخ الخروج</td>
+        </tr>
+        <tr>
+            <td class="label-en">Issue Date</td>
+            <td class="value-cell" id="v-iss"></td>
+            <td class="label-ar">تاريخ إصدار التقرير</td>
+        </tr>
+        <tr>
+            <td class="label-en">Name</td>
+            <td class="value-cell" id="v-name"></td>
+            <td class="label-ar">الاسم</td>
+        </tr>
+        <tr>
+            <td class="label-en">National ID</td>
+            <td class="value-cell" id="v-nid"></td>
+            <td class="label-ar">رقم الهوية</td>
+        </tr>
+        <tr>
+            <td class="label-en">Nationality</td>
+            <td class="value-cell" id="v-nat"></td>
+            <td class="label-ar">الجنسية</td>
+        </tr>
+        <tr>
+            <td class="label-en">Employer</td>
+            <td class="value-cell" id="v-emp"></td>
+            <td class="label-ar">جهة العمل</td>
+        </tr>
+        <tr>
+            <td class="label-en">Practitioner</td>
+            <td class="value-cell" id="v-doc"></td>
+            <td class="label-ar">اسم الممارس</td>
+        </tr>
+    </table>
+
+    <div class="footer-logos">
+        <div class="verification-info">
+            <p><strong>وزارة الصحة - مستشفى الملك سلمان</strong></p>
+            <p>للتحقق من بيانات التقرير يرجى زيارة منصة صحة الرسمية</p>
+            <p>www.seha.sa/#/inquiries/slenquiry</p>
+        </div>
+        <div style="text-align: left;">
+            <img src="https://upload.wikimedia.org/wikipedia/ar/thumb/8/82/Ministry_of_Health_Logo.svg/1200px-Ministry_of_Health_Logo.svg.png" height="50">
+            <p style="font-size: 0.7rem; margin-top: 5px;">المركز الوطني للمعلومات الصحية</p>
+        </div>
+    </div>
+</div>
 
 <script>
-    function openNav() { document.getElementById("sideNav").style.width = "280px"; }
-    function closeNav() { document.getElementById("sideNav").style.width = "0"; }
+    // البيانات المسحوبة من ملف خالد البواردي المرفق
+    const database = [
+        {
+            id: "GSL25090349228",
+            dur: "1 day (03-09-2025 to 03-09-2025)",
+            adm: "03-09-2025",
+            dis: "03-09-2025",
+            iss: "03-09-2025",
+            name: "خالد بن عبد الله بن مسفر البواردي",
+            nid: "1125966687",
+            nat: "السعودية - Saudi Arabia",
+            emp: "جامعه الامام محمد بن سعود",
+            doc: "بلال الجفري - طبيب عام"
+        }
+    ];
 
-    const data = [{ c: "GSL25112358843", i: "1030320903", n: "كتيد شبرم الشمري", d: "2025-11-23", dr: "د. عبدالله ابراهيم العواض" }];
+    function generateReport() {
+        const c = document.getElementById('codeIn').value;
+        const i = document.getElementById('idIn').value;
+        const match = database.find(x => x.id === c && x.nid === i);
 
-    function search() {
-        const cV = document.getElementById('sCode').value;
-        const iV = document.getElementById('nId').value;
-        const match = data.find(x => x.c === cV && x.i === iV);
         if(match) {
-            document.getElementById('out-n').innerText = match.n;
-            document.getElementById('out-d').innerText = match.d;
-            document.getElementById('out-dr').innerText = match.dr;
-            document.getElementById('resultBox').style.display = 'block';
-        } else { alert("البيانات غير صحيحة"); }
+            document.getElementById('v-id').innerText = match.id;
+            document.getElementById('v-dur').innerText = match.dur;
+            document.getElementById('v-adm').innerText = match.adm;
+            document.getElementById('v-dis').innerText = match.dis;
+            document.getElementById('v-iss').innerText = match.iss;
+            document.getElementById('v-name').innerText = match.name;
+            document.getElementById('v-nid').innerText = match.nid;
+            document.getElementById('v-nat').innerText = match.nat;
+            document.getElementById('v-emp').innerText = match.emp;
+            document.getElementById('v-doc').innerText = match.doc;
+            
+            document.getElementById('print-btn-container').style.display = 'block';
+            alert("تم تجهيز التقرير بنجاح. اضغط على زر الطباعة الأخضر للمعاينة.");
+        } else {
+            alert("البيانات غير صحيحة. استخدم البيانات الموجودة في ملف الـ PDF المرفق.");
+        }
     }
 </script>
 </body>
